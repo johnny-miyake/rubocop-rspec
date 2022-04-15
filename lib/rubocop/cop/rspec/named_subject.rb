@@ -16,6 +16,9 @@ module RuboCop
       # `IgnoreSharedExamples` which will not report offenses for implicit
       # subjects in shared example groups.
       #
+      # `IgnoreInsideExpectBlock` ignores `subject` inside an `expect` block
+      # if it is simply executed for testing side effects.
+      #
       # @example
       #   # bad
       #   RSpec.describe User do
@@ -23,6 +26,10 @@ module RuboCop
       #
       #     it 'is valid' do
       #       expect(subject.valid?).to be(true)
+      #     end
+      #
+      #     it 'raises an error' do
+      #       expect { subject }.to raise_error(SomeError)
       #     end
       #   end
       #
@@ -33,6 +40,10 @@ module RuboCop
       #     it 'is valid' do
       #       expect(user.valid?).to be(true)
       #     end
+      #
+      #     it 'raises an error' do
+      #       expect { user }.to raise_error(SomeError)
+      #     end
       #   end
       #
       #   # also good
@@ -41,6 +52,21 @@ module RuboCop
       #
       #     it { is_expected.to be_valid }
       #   end
+      #
+      # @example when configuration is `IgnoreInsideExpectBlock: true`
+      #   # good
+      #   RSpec.describe User do
+      #     subject { described_class.new }
+      #
+      #     it 'is valid' do
+      #       expect(user.valid?).to be(true)
+      #     end
+      #
+      #     it 'raises an error' do
+      #       expect { subject }.to raise_error(SomeError)
+      #     end
+      #   end
+      #
       class NamedSubject < Base
         MSG = 'Name your test subject if you need to reference it explicitly.'
 
@@ -61,6 +87,8 @@ module RuboCop
           end
 
           subject_usage(node) do |subject_node|
+            break if ignored_subject_inside_expect_block?(subject_node)
+
             add_offense(subject_node.loc.selector)
           end
         end
@@ -68,6 +96,12 @@ module RuboCop
         def ignored_shared_example?(node)
           cop_config['IgnoreSharedExamples'] &&
             node.each_ancestor(:block).any?(&method(:shared_example?))
+        end
+
+        def ignored_subject_inside_expect_block?(node)
+          cop_config['IgnoreInsideExpectBlock'] &&
+            node.parent&.block_type? &&
+            node.parent.children.first.method?(:expect)
         end
       end
     end

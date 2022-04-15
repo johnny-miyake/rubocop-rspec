@@ -58,6 +58,35 @@ RSpec.describe RuboCop::Cop::RSpec::NamedSubject do
         end
       RUBY
     end
+
+    context 'when IgnoreInsideExpectBlock is true' do
+      let(:cop_config) { { 'IgnoreInsideExpectBlock' => true } }
+
+      it 'allows subject inside an expect block' do
+        expect_no_offenses(<<-RUBY)
+          RSpec.describe User do
+            subject { described_class.new }
+
+            it { expect { subject }.to raise_error(SomeError) }
+          end
+        RUBY
+      end
+    end
+
+    context 'when IgnoreInsideExpectBlock is false' do
+      let(:cop_config) { { 'IgnoreInsideExpectBlock' => false } }
+
+      it 'suggests explicit subject usage' do
+        expect_offense(<<-RUBY)
+          RSpec.describe User do
+            subject { described_class.new }
+
+            it { expect { subject }.to raise_error(StandardError) }
+                          ^^^^^^^ Name your test subject if you need to reference it explicitly.
+          end
+        RUBY
+      end
+    end
   end
 
   context 'when IgnoreSharedExamples is false' do

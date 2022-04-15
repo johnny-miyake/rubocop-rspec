@@ -3011,6 +3011,9 @@ This cop can be configured in your configuration using the
 `IgnoreSharedExamples` which will not report offenses for implicit
 subjects in shared example groups.
 
+`IgnoreInsideExpectBlock` ignores `subject` inside an `expect` block
+if it is simply executed for testing side effects.
+
 === Examples
 
 [source,ruby]
@@ -3022,6 +3025,10 @@ RSpec.describe User do
   it 'is valid' do
     expect(subject.valid?).to be(true)
   end
+
+  it 'raises an error' do
+    expect { subject }.to raise_error(SomeError)
+  end
 end
 
 # good
@@ -3030,6 +3037,10 @@ RSpec.describe Foo do
 
   it 'is valid' do
     expect(user.valid?).to be(true)
+  end
+
+  it 'raises an error' do
+    expect { user }.to raise_error(SomeError)
   end
 end
 
@@ -3041,6 +3052,24 @@ RSpec.describe Foo do
 end
 ----
 
+==== when configuration is `IgnoreInsideExpectBlock: true`
+
+[source,ruby]
+----
+# good
+RSpec.describe User do
+  subject { described_class.new }
+
+  it 'is valid' do
+    expect(user.valid?).to be(true)
+  end
+
+  it 'raises an error' do
+    expect { subject }.to raise_error(SomeError)
+  end
+end
+----
+
 === Configurable attributes
 
 |===
@@ -3048,6 +3077,10 @@ end
 
 | IgnoreSharedExamples
 | `true`
+| Boolean
+
+| IgnoreInsideExpectBlock
+| `false`
 | Boolean
 |===
 

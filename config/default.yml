@@ -585,6 +585,7 @@ RSpec/NamedSubject:
   Description: Checks for explicitly referenced test subjects.
   Enabled: true
   IgnoreSharedExamples: true
+  IgnoreInsideExpectBlock: false
   VersionAdded: 1.5.3
   StyleGuide: https://rspec.rubystyle.guide/#use-subject
   Reference: https://www.rubydoc.info/gems/rubocop-rspec/RuboCop/Cop/RSpec/NamedSubject

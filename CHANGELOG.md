@@ -6,6 +6,7 @@
 * Add `RSpec/VerifiedDoubleReference` cop. ([@t3h2mas][])
 * Make `RSpec/BeNil` cop configurable with a `be_nil` style and a `be` style. ([@bquorning][])
 * Fix `Capybara/CurrentPathExpectation` autocorrect incompatible with `Style/TrailingCommaInArguments` autocorrect. ([@ydah][])
+* Add `IgnoreInsideExpectBlock` style to `RSpec/NamedSubject` which allows `subject` inside `expect` block. ([@johnny-miyake][])
 
 ## 2.9.0 (2022-02-28)
 
